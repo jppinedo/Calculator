@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="author" content="Juan Pablo Pinedo">
+  <title>Calculator</title>
+</head>
+
+<body>
+  <script type="text/javascript">
+    let running = true; // set default state of the program
+    let numbers = []; // array to store numbers
+    let userInput = 'y'; // default user input
+    let operator = null; // operation not set yet
+    const operations = ['+', '-', '*', '/']; // available operations
+
+    while(running) {
+      let newInput; // values from prompts will be stored here
+
+      // input value is number
+      if(!Number.isNaN(parseInt(userInput))) {
+        
+        // change prompt text depending on the length of the array
+        let promptText = numbers.length === 1 ?
+          `You entered ${numbers[0]}. Enter another y/n?` :
+          `Yout entered ${numbers.length} numbers, are there more y/n?`;
+
+        newInput = prompt(promptText); // store user input in temporal variable
+        // update input value only if is valid at this stage
+        userInput = newInput === 'y' || newInput === 'n' ? newInput : userInput;
+      
+      // input is not a number and there is no operator yet
+      } else if(!operator) {
+
+        // check if input is 'y'
+        if(userInput === 'y') {
+          // conditional welcome text + instruction
+          let promptText = `${!numbers.length ? 'Wecome to the calculator. ' : ''}Enter a number.`;
+          newInput = prompt(promptText); // show prompt
+
+          // input must be a number to update and add to the array
+          if(!Number.isNaN(parseInt(newInput))) {
+            userInput = newInput;
+            numbers.push(parseInt(newInput));
+          } else {
+            userInput = 'y';
+          }
+        
+        // input is 'n' or other
+        } else {
+          // show prompt message to select an operator
+          newInput = prompt(`What Operation would you like to perform ${operations.join(', ')}  ?`);
+          // store operator and new input if is valid only
+          operator = operations.includes(newInput) ? newInput : null;
+          userInput = operator ? operator : userInput;
+        }
+      
+      // input value is not a number, and is a valid operator
+      } else if(operations.includes(userInput)) {
+
+        // use reduce method to loop the array and extract final result
+        const result = numbers.reduce((total, number) => {
+
+          // use switch to select the correct operation
+          switch(operator) { 
+            case '+': return total + number; 
+            case '-': return total - number;
+            case '*': return total * number;
+            case '/': 
+              // in division, if more than 2 numbers, return an error
+              if(numbers.length > 2) { 
+                return 'division-error';
+              } else {
+                return total / number;
+              }
+            default: return 0;
+          }
+        });
+
+        // conditional prompt text if is error, or valid result
+        let promptText = result === 'division-error' ? 
+          'Only two numbers can be divided.':
+          `You entered ${numbers.length} numbers. Your answer is ${result}.`;
+
+        // show prompt
+        newInput = prompt(`${promptText} Would you like to perform another calculation y/n?`);
+
+        // reset calculator if input is 'y' at this stage
+        if(newInput === 'y') {
+          userInput = newInput;
+          operator = null;
+          numbers = [];
+
+        // if input is not 'y', stop the calculator
+        } else {
+          running = false; // this will stop the while loop
+        }
+      }
+    }
+
+    // the program broke out of the loop, so is over
+    alert('Thank you for using the calculator! \nFeel free to come back for any future calculations.');
+  </script>
+</body>
